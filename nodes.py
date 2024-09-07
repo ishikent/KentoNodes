@@ -192,11 +192,11 @@ class WordPermutator:
 
     def run(self, source_text, perm_symbol):
         
-        match = re.findall(f"\|(.*)\|", source_text)
+        match = re.findall(f"\|(.*?)\|", source_text)
 
         #見つからなければテキストをそのまま返す
         if len(match) == 0:
-            return (source_text,)
+            return ([source_text],)
 
         #最初にperm_symbolで囲まれた部分のみ順列をつくる。それ以降は無視
         first_range =  match[0]
@@ -211,15 +211,62 @@ class WordPermutator:
         #順列リストの作成
         perm_result = [source_text.replace(replace_text ,",".join(perm)) for perm in itertools.permutations(perm_list)] #文字列のリストになる
 
-
-        print("====================")
-        print(replace_text)
-        print(perm_result)
         return (perm_result, )
 
+class Debug:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required" : {
+                "perm_output1" : ("STRING", {}),
+            }
+        }
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = ()
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, perm_output1):
+        print("==========DEBUG=================")
+        for i, hoge in enumerate(perm_output1):
+            print(f"=================OUTPUT{i}=====================")
+            print(hoge)
+
+        return ()   
 
 
 
+class PermutateProduct:
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required" : {
+                "perm_output1" : ("STRING", {}),
+                "perm_output2" : ("STRING", {}),
+                "debug" : ("BOOLEAN", {"default":False}),
+            }
+        }
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True, )
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text_list",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, perm_output1, perm_output2, debug):
+        result = list(itertools.chain(perm_output1, perm_output2))
+
+        if debug:
+            for ele in result:
+                print("==========================================")
+                print(ele)
+
+        return (result, )
 
 
 class CounterFileReader:
@@ -551,5 +598,7 @@ NODE_CLASS_MAPPINGS = {
     "TextReplace": TextReplace,
     "SMEA_SWITCH": SMEA_SWITCH,
     "WordPermutator": WordPermutator,
+    "PermutateProduct": PermutateProduct,
+    "Debug": Debug,
 }
 
