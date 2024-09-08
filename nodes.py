@@ -74,6 +74,19 @@ def getWordsFromTexts(text):
     return [word.strip() for word in text.split(",")]
 
 
+def load_file(root_path,name):
+    with open(f"{root_path}/{name}".strip(), "r") as f:
+        lines = [line.strip() for line in f if ((line.strip()) and (not line.strip().startswith('#')))]
+
+    return lines
+
+
+def text_write(text):
+    words = getWordsFromTexts(text)
+    with open(f"{root_path}/{file_path}", "a") as f:
+        f.write(",".join(words) + "\n")
+
+
 import re
 from collections import defaultdict
 class Muti2xPromptEditor:
@@ -583,6 +596,143 @@ class SMEA_SWITCH:
     def run(self, smea):
         return (smea, )
 
+import json
+class PresetWriter:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "file_pointer" : ("ANY", {}),
+            "label" : ("STRING", {}),
+            "text"  : ("STRING", {"multiline":True,}),
+            "mode":(["add,replace","remove","clear"], {}),
+        }}
+
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+    OUTPUT_NODE = True
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, file_pointer, label, text, mode):
+
+
+        #全部消す
+        if mode == "clear":
+            print(mode)
+            file_pointer.write("")
+            return ()
+
+        #jsonファイル読込
+        preset_json = file_pointer.load()
+        preset_json =  preset_json if preset_json else "{}"
+        preset = json.loads(preset_json)
+
+        #テキスト正則化
+        words = getWordsFromTexts(text)
+
+        if mode == "remove":
+            del preset[label]
+        else:
+            #辞書にセット
+            preset[label] = ",".join(words)
+
+        #ファイル書き込み
+        file_pointer.write(json.dumps(preset, ensure_ascii=False))
+
+        return ()
+
+
+class PresetReader:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "file_pointer" : ("ANY", {}),
+            "label" : ("STRING", {}),
+        }}
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("value",)
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+
+    def run(self, file_pointer, label):
+        text = file_pointer.load()
+        preset = json.loads(text)
+
+        if label in preset:
+            result = preset[label]
+        else:
+            result = ""
+        
+        return (result,)
+
+
+class PresetRemover:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "file_pointer" : ("ANY", {}),
+            "label" : ("STRING", {}),
+        }}
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("value",)
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+
+    def run(self, file_pointer, label):
+        text = file_pointer.load()
+        preset = json.loads(text)
+
+        if label in preset:
+            result = preset[label]
+        else:
+            result = ""
+        
+        return (result,)
+
+
+
+import codecs
+class FilePointer:
+    def __init__(self, filename):
+        self.filename = filename
+    
+    def load(self):
+        with codecs.open(self.filename, "r","utf-8") as f:
+            text = f.read()
+        
+        return text
+
+    def write(self, text):
+        with codecs.open(self.filename, "w", "utf-8") as f:
+            f.write(text)
+    
+
+class FilePointerProvider:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "root_path" : ("STRING", {}),
+            "file_path" : ("STRING", {}),
+            "mode" : (["r","w","a", "r+", "w+"], {"default":"w+"}),
+        }}
+
+    RETURN_TYPES = ("ANY",)
+    RETURN_NAMES = ("file_pointer",)
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, root_path, file_path, mode):
+        first_path  = root_path.strip()
+        second_path = file_path.strip()
+
+        fp = FilePointer(f"{first_path}/{second_path}")
+        return (fp, )
+   
+
 
 NODE_CLASS_MAPPINGS = {
     "KentoStrInput": KentoStrInput,
@@ -600,5 +750,8 @@ NODE_CLASS_MAPPINGS = {
     "WordPermutator": WordPermutator,
     "PermutateProduct": PermutateProduct,
     "Debug": Debug,
+    "FilePointerProvider": FilePointerProvider,
+    "PresetWriter": PresetWriter,
+    "PresetReader": PresetReader,
 }
 
