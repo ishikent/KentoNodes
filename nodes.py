@@ -796,6 +796,47 @@ class FilePointerProvider:
         return (fp, )
 
 
+class NAI_Parser:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "settings" : ("STRING", {"forceInput": True}),
+        }}
+
+    RETURN_TYPES = ("STRING","STRING","STRING","FLOAT","FLOAT",)
+    RETURN_NAMES = ("smea","sampler","scheduler","uncond_scale","cfg_rescale",)
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, settings):
+        # 正規表現でキーと値をパースする
+        pattern = r'(\w+): ([^,]+)(?:,|$)'
+        matches = re.findall(pattern, settings)
+
+        # 辞書に変換
+        settings_dict = {key: value.strip() for key, value in matches}
+
+        #smea
+        sm     = settings_dict["sm"]
+        sm_dyn = settings_dict["sm_dyn"]
+        smea = "none"
+        if sm_dyn == "True":
+            smea = "SMEA+DYN"
+        elif sm == "True":
+            smea = "SMEA"
+
+        #uncond_scale
+        uncond_scale = float(settings_dict["uncond_scale"])
+
+        #cfg_rescale
+        cfg_rescale = float(settings_dict["cfg_rescale"])
+
+
+        return (smea, settings_dict["sampler"], settings_dict["noise_schedule"],uncond_scale, cfg_rescale,)
+ 
+
+
 NODE_CLASS_MAPPINGS = {
     "KentoStrInput": KentoStrInput,
     "TextOutput": TextOutput,
@@ -816,5 +857,6 @@ NODE_CLASS_MAPPINGS = {
     "PresetReader": PresetReader,
     "PresetCyclicReader": PresetCyclicReader,
     "TextWoList": TextWoList,
+    "NAI_Parser": NAI_Parser,
 }
 
