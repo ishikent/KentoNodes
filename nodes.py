@@ -580,22 +580,6 @@ class NudeNetSAM:
 
         return (image, nude_sam_mask, )
 
-
-class SMEA_SWITCH:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": {
-            "smea" : (["none", "SMEA", "SMEA+DYN"], {}),
-        }}
-
-    RETURN_TYPES = ("ANY",)
-    RETURN_NAMES = ("smea",)
-    FUNCTION  = "run"
-    CATEGORY = "00_kento_nodes"
-
-    def run(self, smea):
-        return (smea, )
-
 import json
 class PresetWriter:
     @classmethod
@@ -668,32 +652,6 @@ class PresetReader:
         return (result,)
 
 
-class PresetRemover:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": {
-            "file_pointer" : ("ANY", {}),
-            "label" : ("STRING", {}),
-        }}
-
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("value",)
-    FUNCTION  = "run"
-    CATEGORY = "00_kento_nodes"
-
-
-    def run(self, file_pointer, label):
-        text = file_pointer.load()
-        preset = json.loads(text)
-
-        if label in preset:
-            result = preset[label]
-        else:
-            result = ""
-        
-        return (result,)
-
-
 
 import codecs
 class FilePointer:
@@ -709,7 +667,112 @@ class FilePointer:
     def write(self, text):
         with codecs.open(self.filename, "w", "utf-8") as f:
             f.write(text)
-    
+
+    def getFilePath(self):
+        return self.filename
+
+    def getLines(self):
+        with codecs.open(self.filename, "r","utf-8") as f:
+            lines = [line.replace("\n","").strip() for line in f if not line.strip().startswith('#')]
+        
+        return lines
+
+
+class TextWoList:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "optional": {
+                "pre_text_list" : ("ANY", {}),
+                "text_a" : ("STRING", {"forceInput": True}),
+                "text_b" : ("STRING", {"forceInput": True}),
+                "text_c" : ("STRING", {"forceInput": True}),
+                "text_d" : ("STRING", {"forceInput": True}),
+                "text_e" : ("STRING", {"forceInput": True}),
+                "text_f" : ("STRING", {"forceInput": True}),
+                "text_g" : ("STRING", {"forceInput": True}),
+        }}
+
+    RETURN_TYPES = ("STRING","ANY",)
+    RETURN_NAMES = ("text_list","text_list_chain",)
+    OUTPUT_IS_LIST = (True,False,)
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self,**text_list):
+        print()
+        print()
+        print("===========================================")
+        print(text_list)
+
+        if "pre_text_list" in text_list:
+            result = list(itertools.chain(text_list.pop("pre_text_list"), text_list.values()))
+        else:
+            result = list(text_list.values())
+
+        print("=---------result")
+        print(result)
+
+        return (result, result, )
+
+class PresetCyclicReader:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "file_pointer": ("ANY", {}),
+                    "mode": (["count_up","fixed","reset",], {}),
+                },
+                "optional": {
+                    "seed": ("INT:seed", {}),
+                }
+                }
+
+    RETURN_TYPES = ("STRING", "STRING",)
+    RETURN_NAMES = ("label", "value",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def __init__(self):
+        self.initialize_counter()
+
+    def initialize_counter(self):
+        self.counter = Counter()
+        self.keys = None
+        self.values = None
+        self.previous_text_path = ""
+
+    def run(self, file_pointer, mode, seed):
+        print(f"mode ======= {mode}")
+        print(self.previous_text_path)
+        if self.previous_text_path != file_pointer.getFilePath():
+            print("initialize!!!")
+            #Counterインスタンスを新しく作る
+            self.initialize_counter()
+
+
+        if (self.keys is not None) and (mode == "count_up"):
+            print("count up")
+            self.counter.count_up()
+
+        if mode == "reset":
+            print("count reset!!!")
+            #Counterインスタンスは使い回し、カウンタ変数のみリセット
+            self.counter.initialize()
+
+        if self.keys is None:
+                lines = file_pointer.getLines()
+                text  = "".join(lines)
+                text_json = json.loads(text)
+                self.keys   = list(text_json.keys())
+                self.values = list(text_json.values())
+
+        key   = self.keys[self.counter.current() % len(self.keys)]
+        value = self.values[self.counter.current() % len(self.keys)]
+
+        self.previous_text_path = file_pointer.getFilePath()
+
+        return (key,value, )
+
 
 class FilePointerProvider:
     @classmethod
@@ -731,7 +794,6 @@ class FilePointerProvider:
 
         fp = FilePointer(f"{first_path}/{second_path}")
         return (fp, )
-   
 
 
 NODE_CLASS_MAPPINGS = {
@@ -746,12 +808,13 @@ NODE_CLASS_MAPPINGS = {
     "EasyFileWriter": EasyFileWriter,
     "Muti2xPromptEditor": Muti2xPromptEditor,
     "TextReplace": TextReplace,
-    "SMEA_SWITCH": SMEA_SWITCH,
     "WordPermutator": WordPermutator,
     "PermutateProduct": PermutateProduct,
     "Debug": Debug,
     "FilePointerProvider": FilePointerProvider,
     "PresetWriter": PresetWriter,
     "PresetReader": PresetReader,
+    "PresetCyclicReader": PresetCyclicReader,
+    "TextWoList": TextWoList,
 }
 
