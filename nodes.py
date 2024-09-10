@@ -875,20 +875,40 @@ class NAI_Params:
 
         #nai_paramsを作る
         nai_params = {
-            "positve"       : positive,
-            "negative"      : negative,
-            "seed"          : int(settings_dict["seed"]),
-            "steps"         : int(settings_dict["steps"]),
-            "cfg"           : float(settings_dict["scale"]),
-            "width"         : int(settings_dict["width"]),
-            "height"        : self.getSMEA(settings_dict),
-            "smea"          : float(settings_dict["scale"]),
-            "uncond_scale"  : float(settings_dict["uncond_scale"]),
-            "cfg_rescale"   : float(settings_dict["cfg_rescale"]),
+            "positive"          : positive,
+            "negative"          : negative,
+            "seed"              : int(settings_dict["seed"]),
+            "steps"             : int(settings_dict["steps"]),
+            "cfg"               : float(settings_dict["scale"]),
+            "width"             : int(settings_dict["width"]),
+            "height"            : int(settings_dict["height"]),
+            "smea"              : self.getSMEA(settings_dict),
+            "sampler"           : settings_dict["sampler"],
+            "scheduler"         : settings_dict["noise_schedule"],
+            "uncond_scale"      : float(settings_dict["uncond_scale"]),
+            "cfg_rescale"       : float(settings_dict["cfg_rescale"]),
         }
 
         return (nai_params,)
 
+
+class NAI_Params_Parser:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required" : {
+                "nai_params" : ("ANY", {}),
+            }
+        }
+
+    RETURN_NAMES    = ("smea", "sampler", "scheduler", "width", "height", "positive", "negative", "steps", "cfg", "seed", "uncond_scale", "cfg_rescale",)
+    RETURN_TYPES    = ("STRING", "STRING", "STRING", "INT", "INT", "STRING", "STRING", "INT", "FLOAT", "INT", "FLOAT", "FLOAT")
+    FUNCTION        = "run"
+    CATEGORY        = "00_kento_nodes"
+
+    def run(self, nai_params):
+
+        return [nai_params[key] for key in NAI_Params_Parser.RETURN_NAMES]
 
 
 NODE_CLASS_MAPPINGS = {
@@ -913,5 +933,6 @@ NODE_CLASS_MAPPINGS = {
     "TextWoList": TextWoList,
     "NAI_Parser": NAI_Parser,
     "NAI_Params": NAI_Params,
+    "NAI_Params_Parser": NAI_Params_Parser,
 }
 
