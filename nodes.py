@@ -834,7 +834,61 @@ class NAI_Parser:
 
 
         return (smea, settings_dict["sampler"], settings_dict["noise_schedule"],uncond_scale, cfg_rescale,)
- 
+
+
+class NAI_Params:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "positive" : ("STRING", {"forceInput": True}),
+                "negative" : ("STRING", {"forceInput": True}),
+                "settings" : ("STRING", {"forceInput": True}),
+        }}
+
+    RETURN_TYPES = ("ANY",)
+    RETURN_NAMES = ("nai_params",)
+    FUNCTION  = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def getSMEA(self, settings_dict):
+        #smea
+        sm     = settings_dict["sm"]
+        sm_dyn = settings_dict["sm_dyn"]
+        smea = "none"
+        if sm_dyn == "True":
+            smea = "SMEA+DYN"
+        elif sm == "True":
+            smea = "SMEA"
+        
+        return smea
+
+
+    def run(self, positive, negative, settings):
+        # 正規表現でキーと値をパースする
+        pattern = r'(\w+): ([^,]+)(?:,|$)'
+        matches = re.findall(pattern, settings)
+
+        # 辞書に変換
+        settings_dict = {key: value.strip() for key, value in matches}
+
+
+        #nai_paramsを作る
+        nai_params = {
+            "positve"       : positive,
+            "negative"      : negative,
+            "seed"          : int(settings_dict["seed"]),
+            "steps"         : int(settings_dict["steps"]),
+            "cfg"           : float(settings_dict["scale"]),
+            "width"         : int(settings_dict["width"]),
+            "height"        : self.getSMEA(settings_dict),
+            "smea"          : float(settings_dict["scale"]),
+            "uncond_scale"  : float(settings_dict["uncond_scale"]),
+            "cfg_rescale"   : float(settings_dict["cfg_rescale"]),
+        }
+
+        return (nai_params,)
+
 
 
 NODE_CLASS_MAPPINGS = {
@@ -858,5 +912,6 @@ NODE_CLASS_MAPPINGS = {
     "PresetCyclicReader": PresetCyclicReader,
     "TextWoList": TextWoList,
     "NAI_Parser": NAI_Parser,
+    "NAI_Params": NAI_Params,
 }
 
