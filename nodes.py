@@ -588,7 +588,7 @@ class PresetWriter:
             "file_pointer" : ("ANY", {}),
             "label" : ("STRING", {}),
             "text"  : ("STRING", {"multiline":True,}),
-            "mode":(["add,replace","remove","clear"], {}),
+            "mode":(["nothing","add,replace","remove","clear"], {}),
         }}
 
     RETURN_TYPES = ()
@@ -599,6 +599,9 @@ class PresetWriter:
 
     def run(self, file_pointer, label, text, mode):
 
+        #何もしない
+        if mode == "nothing":
+            return ()
 
         #全部消す
         if mode == "clear":
