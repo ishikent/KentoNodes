@@ -913,6 +913,23 @@ class NAI_Params_Parser:
 
         return [nai_params[key] for key in NAI_Params_Parser.RETURN_NAMES]
 
+class muti2x_bool:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "switch":("BOOLEAN", {"default":False}),
+            }
+        }
+
+    RETURN_NAMES = ("boolean",)
+    RETURN_TYPES = ("BOOLEAN",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, switch):
+        return (switch,)
+
 
 NODE_CLASS_MAPPINGS = {
     "KentoStrInput": KentoStrInput,
@@ -937,5 +954,6 @@ NODE_CLASS_MAPPINGS = {
     "NAI_Parser": NAI_Parser,
     "NAI_Params": NAI_Params,
     "NAI_Params_Parser": NAI_Params_Parser,
+    "muti2x_bool": muti2x_bool,
 }
 
