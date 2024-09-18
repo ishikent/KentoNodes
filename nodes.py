@@ -931,6 +931,37 @@ class muti2x_bool:
         return (switch,)
 
 
+class Muti2x_PDF_Convert:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "name":("STRING", {}),
+                "images":("IMAGE", {}),
+            }
+        }
+
+    RETURN_NAMES = ()
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
+    INPUT_IS_LIST = True
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, name, images):
+        # 画像を開き、RGBモードに変換してリストに格納
+        image_list = [convertTensor2PIL(image).convert('RGB') for image in images]
+
+        # 最初の画像を基にPDFを作成し、残りの画像を追加
+        full_output_folder, _, _, _, _  = folder_paths.get_save_image_path("", folder_paths.get_output_directory(), images[0].shape[1], images[0].shape[0])
+        save_path = os.path.join(full_output_folder, f"{name[0]}.pdf")
+        print(save_path)
+        image_list[0].save(save_path, save_all=True, append_images=image_list[1:])
+
+        return ()
+
+
+
 NODE_CLASS_MAPPINGS = {
     "KentoStrInput": KentoStrInput,
     "TextOutput": TextOutput,
@@ -955,5 +986,6 @@ NODE_CLASS_MAPPINGS = {
     "NAI_Params": NAI_Params,
     "NAI_Params_Parser": NAI_Params_Parser,
     "muti2x_bool": muti2x_bool,
+    "Muti2x_PDF_Convert": Muti2x_PDF_Convert,
 }
 
