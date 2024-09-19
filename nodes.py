@@ -941,8 +941,8 @@ class NAI_Params_Parser:
             }
         }
 
-    RETURN_NAMES    = ("smea", "sampler", "scheduler", "width", "height", "positive", "negative", "steps", "cfg", "seed", "uncond_scale", "cfg_rescale",)
-    RETURN_TYPES    = ("STRING", "STRING", "STRING", "INT", "INT", "STRING", "STRING", "INT", "FLOAT", "INT", "FLOAT", "FLOAT")
+    RETURN_NAMES    = ("width", "height", "positive", "negative", "smea", "sampler", "scheduler", "steps", "cfg", "seed", "uncond_scale", "cfg_rescale",)
+    RETURN_TYPES    = ("INT", "INT", "STRING", "STRING", "STRING", "STRING", "STRING", "INT", "FLOAT", "INT", "FLOAT", "FLOAT")
     FUNCTION        = "run"
     CATEGORY        = "00_kento_nodes"
 
