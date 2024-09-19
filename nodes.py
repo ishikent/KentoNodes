@@ -419,6 +419,43 @@ class SaveImageWithCustomInfo:
         return ()
 
 
+class SaveWithJPEGFormat:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "images": ("IMAGE", {"tooltip": "The images to save."}),
+                "filename_prefix": ("STRING", {"default": "JPGFORMAT"})
+            },
+        }
+    
+    RETURN_TYPES = ()
+    FUNCTION = "save_images"
+
+    OUTPUT_NODE = True
+    CATEGORY = "00_kento_nodes"
+
+
+    def save_images(self, images, filename_prefix="WithoutMeta"):
+        full_output_folder, filename, counter, subfolder, _ = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        for (batch_number, image) in enumerate(images):
+            i = 255. * image.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+
+            #アルファチャネルを削除したImageオブジェクトを返す
+            new_img = get_image_alpha255(img)
+
+            filename_with_batch_num = filename.replace("%batch_num%", str(batch_number))
+            file = f"{filename_with_batch_num}_{counter:05}_.jpg"
+            new_img.save(os.path.join(full_output_folder, file), "JPEG", quality=85)
+            counter += 1
+
+        return ()
+
+
 # class TextOutput:
 #     @classmethod
 #     def INPUT_TYPES(s):
@@ -987,5 +1024,6 @@ NODE_CLASS_MAPPINGS = {
     "NAI_Params_Parser": NAI_Params_Parser,
     "muti2x_bool": muti2x_bool,
     "Muti2x_PDF_Convert": Muti2x_PDF_Convert,
+    "SaveWithJPEGFormat": SaveWithJPEGFormat,
 }
 
