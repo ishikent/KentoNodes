@@ -1,7 +1,8 @@
 from .nodes import NODE_CLASS_MAPPINGS
-from .nai_nodes import Mutix2_GenerateNAID
+from .nai_nodes import Mutix2_GenerateNAID,Muti2x_Enhance_Switch
 
 NODE_CLASS_MAPPINGS["Mutix2_GenerateNAID"] = Mutix2_GenerateNAID
+NODE_CLASS_MAPPINGS["Muti2x_Enhance_Switch"] = Muti2x_Enhance_Switch
 
 WEB_DIRECTORY = "./js"
 __all__ = ['NODE_CLASS_MAPPINGS',"WEB_DIRECTORY"]

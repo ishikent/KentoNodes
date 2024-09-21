@@ -45,3 +45,45 @@ class Mutix2_GenerateNAID(GenerateNAID):
       result = super().generate(limit_opus_free, width, height, positive, negative, steps, cfg, decrisper, smea, sampler, scheduler, seed, uncond_scale, cfg_rescale, option)
 
       return result
+
+class Muti2x_Enhance_Switch:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "is_enhanced": ("BOOLEAN",{"default":False}),
+                "option"     : ("NAID_OPTION",),
+                "width"      : ("INT", {"forceInput":True}),
+                "height"     : ("INT", {"forceInput":True}),
+                "smea"       : ("STRING", {"forceInput":True}),
+                "seed"       : ("INT", {"forceInput":True}),
+            },
+            "optional": {
+                "new_seed"   : ("INT", {"forceInput":True}),
+            }
+        }
+
+    RETURN_NAMES = ("option", "width", "height", "smea", "seed", "is_enhanced",)
+    RETURN_TYPES = ("NAID_OPTION", "INT", "INT", "STRING", "INT","BOOLEAN")
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, is_enhanced, option, width, height, smea, seed, new_seed=None):
+      print(option)
+      if is_enhanced:
+        if (width,height) == (832,1216):
+          width,height = (1280,1856)
+        elif (width,height) == (1216,832):
+          width,height = (1856,1280)
+        elif (width,height) == (1024,1024):
+          width,height = (1536,1536)
+
+        smea = "none"
+      else:
+        if "img2img" in option:
+          del option["img2img"]
+
+      #注意:ここはswitchの値に関わらずnew_seedに値が入ってくれば値が上書き
+      seed = new_seed if new_seed else seed
+
+      return (option, width, height, smea, seed, is_enhanced,)
