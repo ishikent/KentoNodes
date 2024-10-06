@@ -150,7 +150,8 @@ class Muti2xPromptEditor:
 
         for replace_word in replace_dict.keys():
             print(replace_word)
-            text = text.replace(replace_word, replace_dict[replace_word])
+            if replace_dict[replace_word]: #読み取ったファイルの中身が空なら飛ばす
+                text = text.replace(replace_word, replace_dict[replace_word])
         # for i in range(len(words)):
         #     if replace_dict in words[i]:
         #         words[i] = words[i].replace() replace_dict[words[i]]
