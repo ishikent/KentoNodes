@@ -903,6 +903,8 @@ class NAI_Params:
         
         return smea
 
+    def get_settings_dict(self):
+        return self.settings_dict
 
     def run(self, positive, negative, settings):
         # 正規表現でキーと値をパースする
@@ -911,7 +913,7 @@ class NAI_Params:
 
         # 辞書に変換
         settings_dict = {key: value.strip() for key, value in matches}
-
+        self.settings_dict = settings_dict
 
         #nai_paramsを作る
         nai_params = {
@@ -931,6 +933,16 @@ class NAI_Params:
 
         return (nai_params,)
 
+class NAI_Params_V2(NAI_Params):
+    def __init__(self):
+      super().__init__()
+
+    def run(self, positive, negative, settings):
+        nai_params = super().run(positive, negative, settings)[0]
+        nai_params["signed_hash"] = super().get_settings_dict()["signed_hash"]
+
+        return (nai_params,)
+
 
 class NAI_Params_Parser:
     @classmethod
@@ -947,8 +959,20 @@ class NAI_Params_Parser:
     CATEGORY        = "00_kento_nodes"
 
     def run(self, nai_params):
+        return [nai_params[key] for key in self.RETURN_NAMES]
 
-        return [nai_params[key] for key in NAI_Params_Parser.RETURN_NAMES]
+
+class NAI_Params_Parser_V2(NAI_Params_Parser):
+
+    RETURN_NAMES = NAI_Params_Parser.RETURN_NAMES + ("signed_hash",)
+    RETURN_TYPES = NAI_Params_Parser.RETURN_TYPES + ("STRING",)
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self, nai_params):
+        return super().run(nai_params)
+
 
 class muti2x_bool:
     @classmethod
@@ -1025,5 +1049,7 @@ NODE_CLASS_MAPPINGS = {
     "muti2x_bool": muti2x_bool,
     "Muti2x_PDF_Convert": Muti2x_PDF_Convert,
     "SaveWithJPEGFormat": SaveWithJPEGFormat,
+    "NAI_Params_V2": NAI_Params_V2,
+    "NAI_Params_Parser_V2": NAI_Params_Parser_V2,
 }
 
