@@ -916,10 +916,10 @@ class Muti2x_Modifier:
             "required": {
                 "text":("STRING", {"forceInput":True}),
                 "file_name": ("STRING", {}),
-                "signed_hash" : ("STRING", {"forceInput":True}),
                 "initialize" : ("BOOLEAN", {"default":False}),
             },
             "optional": {
+                "signed_hash" : ("STRING", {"forceInput":True}),
                 "seed": ("INT:seed", {}),
             }
         }
@@ -930,7 +930,7 @@ class Muti2x_Modifier:
     CATEGORY = "00_kento_nodes"
 
     def __init__(self):
-        self.previous_signed_hash = ""
+        self.previous_signed_hash = "" #画像変更の検知用
 
     def prompt2lines(self, prompt):
         return "\n".join([word.strip().replace(" ","_") for word in prompt.split(",")])
@@ -938,7 +938,7 @@ class Muti2x_Modifier:
     def lines2prompt(self, lines):
         return ",".join([word.replace(" ", "_") for word in lines.split()])
 
-    def run(self, text, file_name, signed_hash, initialize, seed=None):
+    def run(self, text, file_name, initialize, signed_hash="", seed=None):
         dirPath = pathlib.Path("/home/kento/Downloads/text_dir/prompt/2_tmp/")
         filePath = dirPath / file_name
         file_text = ""
