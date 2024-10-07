@@ -3,6 +3,10 @@ from .SaveImageUtils import get_image_alpha255, get_new_pnginfo_kotei
 from PIL import Image, ImageDraw
 import os
 import numpy as np
+from .imgutil import convertTensor2Np, convertNp2Tensor
+from .imgutil import convertTensor2PIL, convertPIL2Tensor
+import zipfile
+from io import BytesIO
 
 class SaveImageWithCustomInfo:
     def __init__(self):
@@ -115,8 +119,43 @@ class Muti2x_PDF_Convert:
         return ()
 
 
+class Muti2x_Zip_Maker:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "name":("STRING", {}),
+                "images":("IMAGE", {}),
+            }
+        }
+
+    RETURN_NAMES = ()
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
+    INPUT_IS_LIST = True
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, name, images):
+        # 画像を開き、RGBモードに変換してリストに格納
+        image_list = [convertTensor2PIL(image).convert('RGB') for image in images]
+
+        # 最初の画像を基にPDFを作成し、残りの画像を追加
+        full_output_folder, _, _, _, _  = folder_paths.get_save_image_path("", folder_paths.get_output_directory(), images[0].shape[1], images[0].shape[0])
+        filename = os.path.join(full_output_folder, f"{name[0]}.zip")
+        with zipfile.ZipFile(filename, 'w') as zf:
+            for i,image in enumerate(image_list):
+                img_byte_arr = BytesIO()
+                image.save(img_byte_arr, format='PNG')
+                img_byte_arr.seek(0)
+                zf.writestr(f"{i:03}.png", img_byte_arr.getvalue())
+
+        return ()
+
+
 NODE_CLASS_MAPPINGS = {
   "SaveImageWithCustomInfo":SaveImageWithCustomInfo,
   "SaveWithJPEGFormat":SaveWithJPEGFormat,
   "Muti2x_PDF_Convert":Muti2x_PDF_Convert,
+  "Muti2x_Zip_Maker":Muti2x_Zip_Maker,
 }
