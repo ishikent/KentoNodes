@@ -73,7 +73,7 @@ class ChainFileReader:
 
 #注意メソッド
 def getWordsFromTexts(text):
-    return [word.strip() for word in text.split(",")]
+    return [word.strip().replace(" ","_") for word in text.split(",") if word]
 
 
 def load_file(root_path,name):
@@ -120,7 +120,8 @@ class Muti2xPromptEditor:
     def load(self, name):
         root_path = "/home/kento/Downloads/text_dir/prompt/0_group"
         with open(f"{root_path}/{name}".strip(), "r") as f:
-            lines = [line.strip() for line in f if ((line.strip()) and (not line.strip().startswith('#')))]
+            content = f.read()
+            lines = [token.strip().replace(" ","_") for token in ",".join(content.split("\n")).split(",") if token and not token.startswith("#")]
 
         if name =="quality":
             print(lines)
@@ -150,10 +151,10 @@ class Muti2xPromptEditor:
         if len(words) == 0:
             return ("", )
 
+        text = ",".join(words)
         for replace_word in replace_dict.keys():
             print(replace_word)
-            if replace_dict[replace_word]: #読み取ったファイルの中身が空なら飛ばす
-                text = text.replace(replace_word, replace_dict[replace_word])
+            text = text.replace(replace_word, replace_dict[replace_word])
         # for i in range(len(words)):
         #     if replace_dict in words[i]:
         #         words[i] = words[i].replace() replace_dict[words[i]]
