@@ -76,10 +76,31 @@ class Muti2x_Pony_Negative:
     return (new_prompt,)
 
 
+class Muti2x_PreSuffix:
+  @classmethod
+  def INPUT_TYPES(s):
+        return {
+            "required": {
+              "prefix" : ("STRING", {}),
+              "prompt" : ("STRING", {}),
+              "suffix" : ("STRING", {}),
+            },
+        }
+
+  RETURN_NAMES = ("prompt",)
+  RETURN_TYPES = ("STRING",)
+  FUNCTION = "run"
+  CATEGORY = "00_kento_nodes"
+
+  def run(self, prefix, prompt, suffix):
+    new_prompt = f"{prefix},{prompt},{suffix}"
+    return (new_prompt,)
+
 
 NODE_CLASS_MAPPINGS = {
   "PromptFormatter":PromptFormatter,
   "Muti2x_TextBox":Muti2x_TextBox,
   "Muti2x_Pony_Positive":Muti2x_Pony_Positive,
   "Muti2x_Pony_Negative":Muti2x_Pony_Negative,
+  "Muti2x_PreSuffix":Muti2x_PreSuffix,
 }
