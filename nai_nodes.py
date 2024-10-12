@@ -46,6 +46,40 @@ class Mutix2_GenerateNAID(GenerateNAID):
 
       return result
 
+def get_scale_size(width, height):
+  if (width,height) == (832,1216):
+    width,height = (1280,1856)
+  elif (width,height) == (1216,832):
+    width,height = (1856,1280)
+  elif (width,height) == (1024,1024):
+    width,height = (1536,1536)
+
+  return (width, height)
+
+
+class ImgScaleNode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "switch"     : ("BOOLEAN", {"default":True}),
+                "width"      : ("INT", {"forceInput":True}),
+                "height"     : ("INT", {"forceInput":True}),
+            },
+        }
+
+    RETURN_NAMES = ("width", "height",)
+    RETURN_TYPES = ("INT", "INT",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, switch, width, height):
+      if switch:
+        return get_scale_size(width, height)
+      else:
+        return (width, height)
+
+
 class Muti2x_Enhance_Switch:
     @classmethod
     def INPUT_TYPES(s):
@@ -71,13 +105,7 @@ class Muti2x_Enhance_Switch:
     def run(self, is_enhanced, option, width, height, smea, seed, new_seed=None):
       print(option)
       if is_enhanced:
-        if (width,height) == (832,1216):
-          width,height = (1280,1856)
-        elif (width,height) == (1216,832):
-          width,height = (1856,1280)
-        elif (width,height) == (1024,1024):
-          width,height = (1536,1536)
-
+        (width, height) = get_scale_size(width, height)
         smea = "none"
       else:
         if "img2img" in option:
@@ -87,3 +115,10 @@ class Muti2x_Enhance_Switch:
       seed = new_seed if new_seed else seed
 
       return (option, width, height, smea, seed, is_enhanced,)
+
+
+NODE_CLASS_MAPPINGS = {
+  "Mutix2_GenerateNAID":Mutix2_GenerateNAID,
+  "ImgScaleNode":ImgScaleNode,
+  "Muti2x_Enhance_Switch":Muti2x_Enhance_Switch,
+}

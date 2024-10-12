@@ -73,7 +73,7 @@ class ChainFileReader:
 
 #注意メソッド
 def getWordsFromTexts(text):
-    return [word.strip() for word in text.split(",")]
+    return [word.strip().replace(" ","_") for word in text.split(",") if word]
 
 
 def load_file(root_path,name):
@@ -120,7 +120,8 @@ class Muti2xPromptEditor:
     def load(self, name):
         root_path = "/home/kento/Downloads/text_dir/prompt/0_group"
         with open(f"{root_path}/{name}".strip(), "r") as f:
-            lines = [line.strip() for line in f if ((line.strip()) and (not line.strip().startswith('#')))]
+            content = f.read()
+            lines = [token.strip().replace(" ","_") for token in ",".join(content.split("\n")).split(",") if token and not token.startswith("#")]
 
         if name =="quality":
             print(lines)
@@ -150,10 +151,10 @@ class Muti2xPromptEditor:
         if len(words) == 0:
             return ("", )
 
+        text = ",".join(words)
         for replace_word in replace_dict.keys():
             print(replace_word)
-            if replace_dict[replace_word]: #読み取ったファイルの中身が空なら飛ばす
-                text = text.replace(replace_word, replace_dict[replace_word])
+            text = text.replace(replace_word, replace_dict[replace_word])
         # for i in range(len(words)):
         #     if replace_dict in words[i]:
         #         words[i] = words[i].replace() replace_dict[words[i]]
@@ -909,66 +910,7 @@ class muti2x_bool:
 
 
 import pathlib
-class Muti2x_Modifier:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "text":("STRING", {"forceInput":True}),
-                "file_name": ("STRING", {}),
-                "signed_hash" : ("STRING", {"forceInput":True}),
-                "initialize" : ("BOOLEAN", {"default":False}),
-            },
-            "optional": {
-                "seed": ("INT:seed", {}),
-            }
-        }
 
-    RETURN_NAMES = ("text",)
-    RETURN_TYPES = ("STRING",)
-    FUNCTION = "run"
-    CATEGORY = "00_kento_nodes"
-
-    def __init__(self):
-        self.previous_signed_hash = ""
-
-    def prompt2lines(self, prompt):
-        return "\n".join([word.strip().replace(" ","_") for word in prompt.split(",")])
-
-    def lines2prompt(self, lines):
-        return ",".join([word.replace(" ", "_") for word in lines.split()])
-
-    def run(self, text, file_name, signed_hash, initialize, seed=None):
-        dirPath = pathlib.Path("/home/kento/Downloads/text_dir/prompt/2_tmp/")
-        filePath = dirPath / file_name
-        file_text = ""
-
-        #ディレクトリが存在しない場合作る
-        if not dirPath.exists():
-            dirPath.mkdir()
-
-        #ファイルが存在しない、もしくは読込画像が変わった
-        #なら初期化処理として書き込む
-        conditions = [
-            not filePath.exists(),
-            signed_hash != self.previous_signed_hash,
-            initialize,
-        ]
-
-        if any(conditions):
-            with filePath.open(mode="w") as f:
-                f.write(self.prompt2lines(text))
-
-        ##----以下はファイルが存在する場合
-
-        #ファイルの内容を反映する
-        output_text = ""
-        with filePath.open(mode="r") as f:
-            output_text = self.lines2prompt(f.read())
-
-        self.previous_signed_hash = signed_hash
-
-        return (output_text,)
 
 
 NODE_CLASS_MAPPINGS = {
@@ -996,6 +938,5 @@ NODE_CLASS_MAPPINGS = {
     "muti2x_bool": muti2x_bool,
     "NAI_Params_V2": NAI_Params_V2,
     "NAI_Params_Parser_V2": NAI_Params_Parser_V2,
-    "Muti2x_Modifier": Muti2x_Modifier,
 }
 
