@@ -3,6 +3,7 @@ from .SaveImageUtils import get_image_alpha255, get_new_pnginfo_kotei
 from PIL import Image, ImageDraw
 import os
 import numpy as np
+from .imgutil import convertTensor2PIL, convertPIL2Tensor
 
 class SaveImageWithCustomInfo:
     def __init__(self):

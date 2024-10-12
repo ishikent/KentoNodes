@@ -1,4 +1,5 @@
 from custom_nodes.KentoNodes.node_utils import text_utils
+import pathlib
 
 class PromptFormatter:
   @classmethod
@@ -97,10 +98,68 @@ class Muti2x_PreSuffix:
     return (new_prompt,)
 
 
+class Muti2x_Modifier:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "text":("STRING", {"forceInput":True}),
+                "file_name": ("STRING", {}),
+                "initialize" : ("BOOLEAN", {"default":False}),
+            },
+            "optional": {
+                "signed_hash" : ("STRING", {"forceInput":True}),
+                "seed": ("INT:seed", {}),
+            }
+        }
+
+    RETURN_NAMES = ("text",)
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def __init__(self):
+        self.previous_signed_hash = "" #画像変更の検知用
+
+    def prompt2lines(self, prompt):
+        return "\n".join([word.strip().replace(" ","_") for word in prompt.split(",")])
+
+    def lines2prompt(self, lines):
+        return ",".join([word.replace(" ", "_") for word in lines.split()])
+
+    def run(self, text, file_name, initialize, signed_hash="", seed=None):
+        dirPath = pathlib.Path("/home/kento/Downloads/text_dir/prompt/2_tmp/")
+        filePath = dirPath / file_name
+        file_text = ""
+
+        #ディレクトリが存在しない場合作る
+        if not dirPath.exists():
+            dirPath.mkdir()
+
+        #ファイルが存在しない、もしくは読込画像が変わった
+        #なら初期化処理として書き込む
+        conditions = [
+            not filePath.exists(),
+            signed_hash != self.previous_signed_hash,
+            initialize,
+        ]
+
+        if any(conditions):
+          text_utils.write_token_on_file(filePath.resolve(), text)
+
+        ##----以下はファイルが存在する場合
+
+        #ファイルの内容を反映する
+        output_text = text_utils.get_formatted_prompt_from_file(filePath.resolve())
+        self.previous_signed_hash = signed_hash
+
+        return (output_text,)
+
 NODE_CLASS_MAPPINGS = {
   "PromptFormatter":PromptFormatter,
   "Muti2x_TextBox":Muti2x_TextBox,
   "Muti2x_Pony_Positive":Muti2x_Pony_Positive,
   "Muti2x_Pony_Negative":Muti2x_Pony_Negative,
   "Muti2x_PreSuffix":Muti2x_PreSuffix,
+  "Muti2x_Modifier": Muti2x_Modifier,
 }
