@@ -116,9 +116,27 @@ class Muti2x_Enhance_Switch:
 
       return (option, width, height, smea, seed, is_enhanced,)
 
+class SMEA_SWITCH:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+              "smea": (["none", "SMEA", "SMEA+DYN"], { "default": "none" }),
+            },
+        }
+
+    RETURN_NAMES = ("smea",)
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, smea):
+      return (smea,)
+
 
 NODE_CLASS_MAPPINGS = {
   "Mutix2_GenerateNAID":Mutix2_GenerateNAID,
   "ImgScaleNode":ImgScaleNode,
   "Muti2x_Enhance_Switch":Muti2x_Enhance_Switch,
+  "SMEA_SWITCH":SMEA_SWITCH,
 }
