@@ -93,7 +93,64 @@ class Muti2x_SD_Reader:
 
         return images
 
+class Counter:
+    def __init__(self):
+        self.count = 0
+
+    def current(self):
+        return self.count
+
+    def count_up(self):
+        self.count = self.count + 1
+
+    def initialize(self):
+        self.count = 0
+
+class Muti2x_Counter:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "total_count"      : ("INT", {}),
+                    "mode"     : (["count_up","fixed","reset",], {}),
+                },
+                "optional": {
+                    "seed": ("INT:seed", {}),
+                }
+                }
+
+    RETURN_TYPES = ("INT", )
+    RETURN_NAMES = ("count",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def __init__(self):
+        self.initialize_counter()
+
+    def initialize_counter(self):
+        self.counter = Counter()
+        self.previous_total = None
+        self.previous_mode  = None
+
+    def run(self, total_count, mode, seed):
+        if self.previous_total != total_count:
+            self.initialize_counter()
+
+        if (self.previous_mode == mode) and (mode == "count_up"):
+            self.counter.count_up()
+
+        if mode == "reset":
+            #Counterインスタンスは使い回し、カウンタ変数のみリセット
+            self.counter.initialize()
+
+        count = self.counter.current() % total_count
+
+        self.previous_total = total_count
+        self.previous_mode  = mode
+
+        return (count,)
+
 
 NODE_CLASS_MAPPINGS = {
   "Muti2x_SD_Reader":Muti2x_SD_Reader,
+  "Muti2x_Counter":Muti2x_Counter,
 }
