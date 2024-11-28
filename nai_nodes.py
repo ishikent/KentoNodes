@@ -86,6 +86,7 @@ class Muti2x_Enhance_Switch:
         return {
             "required": {
                 "is_enhanced": ("BOOLEAN",{"default":False}),
+                "is_img2img" : ("BOOLEAN",{"default":False}),
                 "option"     : ("NAID_OPTION",),
                 "width"      : ("INT", {"forceInput":True}),
                 "height"     : ("INT", {"forceInput":True}),
@@ -97,15 +98,17 @@ class Muti2x_Enhance_Switch:
             }
         }
 
-    RETURN_NAMES = ("option", "width", "height", "smea", "seed", "is_enhanced",)
-    RETURN_TYPES = ("NAID_OPTION", "INT", "INT", "STRING", "INT","BOOLEAN")
+    RETURN_NAMES = ("option", "width", "height", "smea", "seed", "is_enhanced", "is_img2img",)
+    RETURN_TYPES = ("NAID_OPTION", "INT", "INT", "STRING", "INT","BOOLEAN", "BOOLEAN",)
     FUNCTION = "run"
     CATEGORY = "00_kento_nodes"
 
-    def run(self, is_enhanced, option, width, height, smea, seed, new_seed=None):
+    def run(self, is_enhanced,is_img2img,option, width, height, smea, seed, new_seed=None):
       print(option)
       if is_enhanced:
         (width, height) = get_scale_size(width, height)
+        smea = "none"
+      elif is_img2img:
         smea = "none"
       else:
         if "img2img" in option:
@@ -114,7 +117,7 @@ class Muti2x_Enhance_Switch:
       #注意:ここはswitchの値に関わらずnew_seedに値が入ってくれば値が上書き
       seed = new_seed if new_seed else seed
 
-      return (option, width, height, smea, seed, is_enhanced,)
+      return (option, width, height, smea, seed, is_enhanced,is_img2img,)
 
 class SMEA_SWITCH:
     @classmethod
