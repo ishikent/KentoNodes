@@ -7,6 +7,27 @@ import os
 import numpy as np
 import torch
 
+class Muti2x_Img_Num:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "root"         : ("STRING", {}),
+                "dirname"      : ("STRING", {}),
+            },
+        }
+
+    RETURN_NAMES = ("image_num",)
+    RETURN_TYPES = ("INT",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, root, dirname):
+      target_dir = Path(root) / dirname
+      img_num = len(list(target_dir.glob("*.png")))
+      return (img_num,)
+
+
 class Muti2x_SD_Reader:
     @classmethod
     def INPUT_TYPES(s):
@@ -153,4 +174,5 @@ class Muti2x_Counter:
 NODE_CLASS_MAPPINGS = {
   "Muti2x_SD_Reader":Muti2x_SD_Reader,
   "Muti2x_Counter":Muti2x_Counter,
+  "Muti2x_Img_Num":Muti2x_Img_Num,
 }
