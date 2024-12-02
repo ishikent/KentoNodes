@@ -1,6 +1,28 @@
 from custom_nodes.KentoNodes.node_utils import text_utils
 import pathlib
 
+class Muti2x_Prompt_Excluder:
+  @classmethod
+  def INPUT_TYPES(s):
+        return {
+            "required": {
+                "source" : ("STRING", {"forceInput":True}),
+                "prompt" : ("STRING", {"multiline":True}),
+            },
+        }
+
+  RETURN_NAMES = ("prompt",)
+  RETURN_TYPES = ("STRING",)
+  FUNCTION = "run"
+  CATEGORY = "00_kento_nodes"
+
+  def run(self,source,prompt):
+    excl = set(text_utils.get_formatted_tokens(prompt))
+    source_list = text_utils.get_formatted_tokens(source)
+    result = ",".join([x for x in source_list if x not in excl])
+    return (result,)
+
+
 class PromptFormatter:
   @classmethod
   def INPUT_TYPES(s):
@@ -156,6 +178,7 @@ class Muti2x_Modifier:
         return (output_text,)
 
 NODE_CLASS_MAPPINGS = {
+  "Muti2x_Prompt_Excluder":Muti2x_Prompt_Excluder,
   "PromptFormatter":PromptFormatter,
   "Muti2x_TextBox":Muti2x_TextBox,
   "Muti2x_Pony_Positive":Muti2x_Pony_Positive,

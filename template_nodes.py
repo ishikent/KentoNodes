@@ -66,7 +66,6 @@ class Muti2x_SD_Reader:
 
       for file in sorted(directory.glob("*.png")):
         img = Image.open(file)
-
         data = json.loads(img.info["Comment"])
         positives.append(data.get(label["positive"] ,""))
         negatives.append(data.get(label["negative"] ,""))

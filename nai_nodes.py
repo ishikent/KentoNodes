@@ -110,9 +110,6 @@ class Muti2x_Enhance_Switch:
         smea = "none"
       elif is_img2img:
         smea = "none"
-      else:
-        if "img2img" in option:
-          del option["img2img"]
 
       #注意:ここはswitchの値に関わらずnew_seedに値が入ってくれば値が上書き
       seed = new_seed if new_seed else seed
