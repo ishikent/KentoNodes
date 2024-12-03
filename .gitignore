@@ -8,5 +8,4 @@ test.py
 data/
 *.png
 *.jpg
-*.txt
 __pycache__/
