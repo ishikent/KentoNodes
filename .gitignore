@@ -1,4 +1,9 @@
-*/
+data/
+discord_uploader/
+images/
+js/
+test_script/
+zip_and_pdf/
 test.py
 data/
 *.png
