@@ -1,4 +1,5 @@
 import folder_paths
+from custom_nodes.KentoNodes.general import path_utils
 
 class Counter:
     def __init__(self):
@@ -44,7 +45,7 @@ class ChainFileReader:
     def INPUT_TYPES(s):
         return {
                     "required": {
-                        "root_path": ("STRING", {"default":"/home/kento/Downloads/text_dir/prompt"}),
+                        "root_path": ("STRING", {"default":f"{path_utils.get_root_path()}/text_dir/prompt"}),
                         "file_path": ("STRING", {"forceInput" : False, "multiline": False}),
                         "seed"     : ("INT:seed", {}),
                     },
@@ -118,7 +119,7 @@ class Muti2xPromptEditor:
         return dd
 
     def load(self, name):
-        root_path = "/home/kento/Downloads/text_dir/prompt/0_group"
+        root_path = f"{path_utils.get_root_path()}/text_dir/prompt/0_group"
         with open(f"{root_path}/{name}".strip(), "r") as f:
             content = f.read()
             lines = [token.strip().replace(" ","_") for token in ",".join(content.split("\n")).split(",") if token and not token.startswith("#")]
@@ -347,7 +348,7 @@ class EasyFileWriter:
     def INPUT_TYPES(s):
         return {
             "required" : {
-                "root_path" : ("STRING", {"default":"/home/kento/Downloads/text_dir/prompt/0_group"}),
+                "root_path" : ("STRING", {"default":f"{path_utils.get_root_path()}/text_dir/prompt/0_group"}),
                 "file_path" : ("STRING", {}),
                 "file_path" : ("STRING", {}),
                 "text" : ("STRING", {"multiline":True}),

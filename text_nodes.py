@@ -1,5 +1,6 @@
 from custom_nodes.KentoNodes.node_utils import text_utils
 import pathlib
+from custom_nodes.KentoNodes.general import path_utils
 
 class Muti2x_Prompt_Excluder:
   @classmethod
@@ -150,7 +151,7 @@ class Muti2x_Modifier:
         return ",".join([word.replace(" ", "_") for word in lines.split()])
 
     def run(self, text, file_name, initialize, signed_hash="", seed=None):
-        dirPath = pathlib.Path("/home/kento/Downloads/text_dir/prompt/2_tmp/")
+        dirPath = pathlib.Path(f"{path_utils.get_root_path()}/text_dir/prompt/2_tmp/")
         filePath = dirPath / file_name
         file_text = ""
 
