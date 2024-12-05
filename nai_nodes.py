@@ -29,7 +29,7 @@ class Mutix2_GenerateNAID(GenerateNAID):
     FUNCTION = "generate"
     CATEGORY = "00_kento_nodes"
 
-    def generate(self, limit_opus_free, width, height, positive, negative, steps, cfg, decrisper, smea, sampler, scheduler, seed, uncond_scale, cfg_rescale, option=None, sub_folder_path="", smea_optional=None, sampler_optional=None, scheduler_optional=None):
+    def generate(self, limit_opus_free, width, height, positive, negative, steps, cfg, decrisper, variety, smea, sampler, scheduler, seed, uncond_scale, cfg_rescale, keep_alpha, option=None, sub_folder_path="", smea_optional=None, sampler_optional=None, scheduler_optional=None):
 
       #改修1.optionalに入力があった場合書き換え
       smea      = smea_optional      if smea_optional else smea
@@ -42,7 +42,7 @@ class Mutix2_GenerateNAID(GenerateNAID):
         sub_folder = Path(self.output_dir) / sub_folder_path.strip()
         self.output_dir = str(sub_folder.resolve())
 
-      result = super().generate(limit_opus_free, width, height, positive, negative, steps, cfg, decrisper, smea, sampler, scheduler, seed, uncond_scale, cfg_rescale, option)
+      result = super().generate(limit_opus_free, width, height, positive, negative, steps, cfg, decrisper, variety, smea, sampler, scheduler, seed, uncond_scale, cfg_rescale, keep_alpha, option)
 
       return result
 
