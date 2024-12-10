@@ -24,7 +24,7 @@ class Muti2x_Prompt_Excluder:
     return (result,)
 
 
-class PromptFormatter:
+class Muti2x_PromptFormatter:
   @classmethod
   def INPUT_TYPES(s):
         return {
@@ -42,7 +42,7 @@ class PromptFormatter:
     return (formatted_prompt,)
 
 
-class Muti2x_TextBox(PromptFormatter):
+class Muti2x_TextBox(Muti2x_PromptFormatter):
   @classmethod
   def INPUT_TYPES(s):
         input_dict = super().INPUT_TYPES()
@@ -180,7 +180,7 @@ class Muti2x_Modifier:
 
 NODE_CLASS_MAPPINGS = {
   "Muti2x_Prompt_Excluder":Muti2x_Prompt_Excluder,
-  "PromptFormatter":PromptFormatter,
+  "Muti2x_PromptFormatter":Muti2x_PromptFormatter,
   "Muti2x_TextBox":Muti2x_TextBox,
   "Muti2x_Pony_Positive":Muti2x_Pony_Positive,
   "Muti2x_Pony_Negative":Muti2x_Pony_Negative,
