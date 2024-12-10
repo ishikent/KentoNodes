@@ -41,6 +41,19 @@ class Muti2x_PromptFormatter:
     formatted_prompt = text_utils.get_formatted_prompt(prompt)
     return (formatted_prompt,)
 
+class Muti2x_PromptSpacer(Muti2x_PromptFormatter):
+  @classmethod
+  def INPUT_TYPES(s):
+        return super().INPUT_TYPES()
+
+  RETURN_NAMES = ("prompt",)
+  RETURN_TYPES = ("STRING",)
+  FUNCTION = "run"
+  CATEGORY = "00_kento_nodes"
+
+  def run(self, prompt):
+    space_prompt = " ".join(super().run(prompt)[0].split("_"))
+    return (space_prompt,)
 
 class Muti2x_TextBox(Muti2x_PromptFormatter):
   @classmethod
@@ -181,6 +194,7 @@ class Muti2x_Modifier:
 NODE_CLASS_MAPPINGS = {
   "Muti2x_Prompt_Excluder":Muti2x_Prompt_Excluder,
   "Muti2x_PromptFormatter":Muti2x_PromptFormatter,
+  "Muti2x_PromptSpacer":Muti2x_PromptSpacer,
   "Muti2x_TextBox":Muti2x_TextBox,
   "Muti2x_Pony_Positive":Muti2x_Pony_Positive,
   "Muti2x_Pony_Negative":Muti2x_Pony_Negative,
