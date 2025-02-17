@@ -1,0 +1,3 @@
+[submodule "ComfyUI_NAIDGenerator"]
+	path = ComfyUI_NAIDGenerator
+	url = https://github.com/bedovyy/ComfyUI_NAIDGenerator.git
