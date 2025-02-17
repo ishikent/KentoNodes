@@ -1,5 +1,5 @@
 from pathlib import Path
-from ComfyUI_NAIDGenerator.nodes import GenerateNAID
+from custom_nodes.KentoNodes.ComfyUI_NAIDGenerator.nodes import GenerateNAID
 import folder_paths
 
 class Mutix2_GenerateNAID(GenerateNAID):
