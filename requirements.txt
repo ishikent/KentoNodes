@@ -1,2 +1,3 @@
 nudenet
+duckdb
 git+https://github.com/facebookresearch/segment-anything.git

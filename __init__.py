@@ -5,7 +5,6 @@ import custom_nodes.KentoNodes.text_nodes as text_nodes
 import custom_nodes.KentoNodes.template_nodes as template_nodes
 import custom_nodes.KentoNodes.remote_nodes as remote_nodes
 import custom_nodes.KentoNodes.db_nodes as db_nodes
-import aiohttp
 import server
 from PIL import Image
 from io import BytesIO

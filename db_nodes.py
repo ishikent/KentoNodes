@@ -16,7 +16,7 @@ class Artist_Queue:
 
     def __init__(self):
         self.con = duckdb.connect()  # インメモリDBを作成
-        query = "SELECT tag_string_artist FROM read_parquet('/mnt/ssd2/home/Data/Comfy_Data/storage/db/artist_name.parquet')"
+        query = "SELECT tag_string_artist FROM read_parquet('/Comfy_Share/storage/db/artist_name.parquet')"
         self.counter = self.query_row_by_row(query)
 
     def run(self, seed=None):
