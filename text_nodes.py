@@ -1,6 +1,48 @@
 from custom_nodes.KentoNodes.node_utils import text_utils
 import pathlib
 from custom_nodes.KentoNodes.general import path_utils
+import re
+
+
+class Muti2x_Prompt_Escaper:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "source": ("STRING", {"forceInput": True}),
+                "symbol": ("STRING", {"default": "|"}),  # default symbol is "|"
+            },
+        }
+
+    RETURN_NAMES = ("dest",)
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "run"
+    CATEGORY = "00_kento_nodes"
+
+    def run(self, source, symbol="|"):
+        """入力テキストの特殊文字 (){} をエスケープし、指定された記号を()に置き換える関数."""
+
+        # 1. symbolで囲まれた部分を一意のプレースホルダーに置き換え
+        placeholders = []
+
+        def replace_symbol(match):
+            placeholder = f"__symbol_placeholder_{len(placeholders)}__"
+            placeholders.append(match.group(1))  # symbolで囲まれた内容を記録
+            return placeholder
+
+        # symbolで囲まれた部分をプレースホルダーに置き換え
+        temp_source = re.sub(rf"\{symbol}(.+?)\{symbol}", replace_symbol, source)
+
+        # 2. (){} をエスケープ
+        temp_source = re.sub(r"([\(\)\{\}])", r"\\\1", temp_source)
+
+        # 3. プレースホルダーを対応する(実は)の形式に戻す
+        for idx, placeholder in enumerate(placeholders):
+            temp_source = temp_source.replace(
+                f"__symbol_placeholder_{idx}__", f"({placeholder})"
+            )
+
+        return (temp_source,)
 
 
 class Muti2x_Prompt_Excluder:
