@@ -6,6 +6,8 @@ import custom_nodes.KentoNodes.template_nodes as template_nodes
 import custom_nodes.KentoNodes.remote_nodes as remote_nodes
 import aiohttp
 import server
+from PIL import Image
+from io import BytesIO
 
 NODE_CLASS_MAPPINGS.update(nai_nodes.NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(ddn.NODE_CLASS_MAPPINGS)
@@ -17,25 +19,38 @@ WEB_DIRECTORY = "./js"
 __all__ = ['NODE_CLASS_MAPPINGS',"WEB_DIRECTORY"]
 # __all__ = ['NODE_CLASS_MAPPINGS']
 
-@server.PromptServer.instance.routes.post("/send_image")
-async def send_image(request):
-    data = await request.json()
+import logging
 
-    port = 8188 #これマジックナンバーで指定してるので、後で変更する
-    async with aiohttp.ClientSession() as session:
-        #Comfyサーバーに画像を送信
-        async with session.post(f"localhost:{port}/upload/image", data=data) as response:
-            return aiohttp.web.Response(status=response.status)
+# 既存ルートが登録されているかどうかを確認する関数
+def is_route_defined(route):
+    for r in server.PromptServer.instance.routes:
+        if r.path == route:
+            return True
+    return False
 
-    #recieve_imageノードに情報を送信
-    overwrite = data.get("overwrite", False)
-    subfolder = data.get("subfolder", "")
-    type = data.get("type", "")
+# ルートを一度だけ定義する関数
+def add_route_once():
+    route = "/kento/send_image"
 
-    img_info = {
-        "overwrite": overwrite,
-        "subfolder": subfolder,
-        "type": type
-    }
-    # クライアントでテキストを更新するメッセージを送信
-    server.PromptServer.instance.send_sync("send_imgage", data)
+    # すでにルートが定義されている場合は追加しない
+    if not is_route_defined(route):
+        @server.PromptServer.instance.routes.post(route)
+        async def send_image(request):
+            data = await request.post()
+            image_file = data["image"]
+
+            # 画像ファイルをバイナリとして読み込む
+            image_bytes = await image_file.read()
+
+            # PIL.Imageとして変換
+            image = Image.open(BytesIO(image_bytes))
+
+            # クライアントでテキストを更新するメッセージを送信
+            server.PromptServer.instance.send_sync("send_imgage", data)
+
+        logging.debug(f"Route {route} has been added.")
+    else:
+        logging.debug(f"Route {route} already exists, skipping definition.")
+
+# ルートの定義は、例えばアプリケーションが初期化されるタイミングで呼ばれる
+add_route_once()
