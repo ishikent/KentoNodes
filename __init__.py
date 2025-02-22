@@ -4,6 +4,7 @@ import custom_nodes.KentoNodes.data_dist_nodes as ddn
 import custom_nodes.KentoNodes.text_nodes as text_nodes
 import custom_nodes.KentoNodes.template_nodes as template_nodes
 import custom_nodes.KentoNodes.remote_nodes as remote_nodes
+import custom_nodes.KentoNodes.db_nodes as db_nodes
 import aiohttp
 import server
 from PIL import Image
@@ -14,6 +15,7 @@ NODE_CLASS_MAPPINGS.update(ddn.NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(text_nodes.NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(template_nodes.NODE_CLASS_MAPPINGS)
 NODE_CLASS_MAPPINGS.update(remote_nodes.NODE_CLASS_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(db_nodes.NODE_CLASS_MAPPINGS)
 
 WEB_DIRECTORY = "./js"
 __all__ = ['NODE_CLASS_MAPPINGS',"WEB_DIRECTORY"]
